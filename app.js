@@ -67,25 +67,7 @@ const utils = {
 		}
 	},
 
-	isRefererValid: (referer) => {
-		const validRefs = ["http://stylifyme.com",
-						"http://www.stylifyme.com",
-						"http://stylify.herokuapp.com",
-						"http://localhost:9185",
-						"http://localhost:7210",
-						"http://localhost:" + app.get('port')];
-		let isvalid = false;
-		for (valRef in validRefs) {
-			if (referer.indexOf(validRefs[valRef]) == 0) {
-				isvalid = true;
-				return true;
-			}
-		}
-		if (!isvalid) {
-			console.log("ERR:Invalid referer:", referer);
-		}
-		return isvalid;
-	},
+	isRefererValid: (_) => true,
 
 	parsePhantomResponse: (err, stdout, stderr, onsuccess, onerror) => {
 		let jsonResponse = {};

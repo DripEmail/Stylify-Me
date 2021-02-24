@@ -255,7 +255,6 @@ function crawl() {
 			if (main && url != address) {
 				address = url;
 				page.close();
-				// // crawl();
 				setTimeout(crawl, 100); //Note the setTimeout here
 			}
 		};

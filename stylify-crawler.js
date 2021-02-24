@@ -254,8 +254,8 @@ function crawl() {
 		page.onNavigationRequested = function (url, type, willNavigate, main) {
 			url = url.replace(/#.+/, "")
 
-			if (main && newAddress != address) {
-				address = newAddress;
+			if (main && url != address) {
+				address = url;
 				page.close();
 				setTimeout(crawl, 100); //Note the setTimeout here
 			}

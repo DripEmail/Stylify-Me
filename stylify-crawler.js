@@ -210,7 +210,7 @@ function parsePage (page, address){
 function crawl() {
 	try{
 		page = require('webpage').create()
-	
+
 		/*request and render settings*/
 		page.zoomFactor = 1;
 		page.viewportSize = { width: 1024, height: 768 };
@@ -220,19 +220,19 @@ function crawl() {
 			//pretend to be Safari 9 - (similar engine as PhantomJS) change this if you want to pretend to be another browser
 			userAgent : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/601.1.56 (KHTML, like Gecko) Version/9.0 Safari/537.86.1"
 		};
-	
+
 		page.settings.userAgent = config.userAgent;
-	
+
 		//print out console logs on page level
 		page.onConsoleMessage = function (msg) {
 			utils.log(msg)
 		};
-	
+
 		page.onAlert = function (msg) {
 			//ignore alerts
 			//console.log('ALERT: ' + msg);
 		};
-	
+
 		//error tracing
 		page.onError = function(msg, trace) {
 				var msgStack = ['ERROR: ' + msg];
@@ -248,10 +248,10 @@ function crawl() {
 			//phantom.exit();
 			return;
 		};
-	
+
 		page.onNavigationRequested = function (url, type, willNavigate, main) {
 			console.log("nav", main, url, args[1]);
-	
+
 			if (main && url != args[1]) {
 				args[1] = url;
 				page.close();
@@ -259,7 +259,7 @@ function crawl() {
 				setTimeout(crawl, 100); //Note the setTimeout here
 			}
 		};
-	
+
 		//main
 		if (args.length === 0) {
 				console.log('Usage: color-crawler.js <some URL>');

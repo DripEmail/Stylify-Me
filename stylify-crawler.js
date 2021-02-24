@@ -1,6 +1,8 @@
 "use strict";
 var	args = require('system').args,
-	page, address, isDebug, saveImage;
+	page, isDebug, saveImage;
+
+var address = args[1];
 
 /*phantom settings*/
 phantom.cookiesEnabled = true;
@@ -250,10 +252,8 @@ function crawl() {
 		};
 
 		page.onNavigationRequested = function (url, type, willNavigate, main) {
-			console.log("nav", main, url, args[1]);
-
-			if (main && url != args[1]) {
-				args[1] = url;
+			if (main && url != address) {
+				address = url;
 				page.close();
 				// // crawl();
 				setTimeout(crawl, 100); //Note the setTimeout here
@@ -265,7 +265,6 @@ function crawl() {
 				console.log('Usage: color-crawler.js <some URL>');
 				phantom.exit();
 		}else{
-			address = args[1];
 			saveImage = args[2] !== "false";
 			isDebug = args[3] === "true";
 			if(utils.isValidURL(address)){

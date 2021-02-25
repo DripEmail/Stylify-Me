@@ -29,7 +29,7 @@ This repo only contains the web service, you can query it from the front end lik
 
 ```javaScript
 var urlToQuery = encodeURIComponent("http://google.com");
-
+ 
 $.ajax({
 	dataType: "jsonp",
 	url: "http://youreServiceUrl.com/query?url="+ urlToQuery,

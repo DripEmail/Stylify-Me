@@ -45,4 +45,4 @@ $.ajax({
 	alert("Could not query site, the service might be down, please try again later.");
 });
 ```
-
+ 

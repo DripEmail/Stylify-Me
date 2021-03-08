@@ -158,7 +158,7 @@ function parsePage (page, address){
 				//create RGBColor object
 				colour = rgb2hex(el.css(prop));
 
-        nodename = el.prop("nodeName")
+        nodename = el.prop("nodeName");
 
         if (nodename === "A") {
           if (linkColors[colour]) {
@@ -169,7 +169,6 @@ function parsePage (page, address){
             linkColors[colour][prop] = 1;
           }
         }
-
 
         if (nodename === "BUTTON") {
           if (buttonColors[colour]) {

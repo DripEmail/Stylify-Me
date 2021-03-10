@@ -239,6 +239,13 @@ app.get("/query", async (req, res) => {
       .build();
     driver.get(url);
 
+    await new Promise((resolve, reject) => {
+      fs.readFile("./lib/jquery-2.1.1.min.js", "utf8", async (err, data) => {
+        await driver.executeScript(data);
+        resolve();
+      });
+    });
+
     jsonResponse = await new Promise((resolve, reject) => {
       fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
         try {

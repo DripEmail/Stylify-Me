@@ -13,7 +13,9 @@ const http = require('http')
 	, serveStatic = require('serve-static')
 	, compression = require('compression')
 	, phantomjs = require('phantomjs-prebuilt')
-	, logoScrape = require('logo-scrape');
+	, logoScrape = require('logo-scrape')
+  , chrome = require('selenium-webdriver/chrome')
+  , { Builder } = require('selenium-webdriver');
 
 /* Variables / Config */
 const config = {
@@ -225,38 +227,45 @@ app.get('/getpdf', (req, res) => {
 
 
 // returns stylify json
-app.get('/query', (req, res) => {
-	const referer = req.get("Referer") || "http://stylify.herokuapp.com"
-		, showImage = true
-		, debugMode = false;
-	let url, childArgs, phantomProcess;
-	if (utils.isRefererValid(referer)) {
-		url = req.query["url"];
-		if (url && utils.isValidURL(url)) {
-			childArgs = [config.crawlerFilePath, req.query["url"], showImage, debugMode];
-			try {
-				phantomProcess = childProcess.execFile(config.binPath, childArgs, { timeout: 25000 }, (err, stdout, stderr) => {
-					utils.parsePhantomResponse(err, stdout, stderr, (jsonResponse) => {
-						logoScrape.LogoScrape.getLogos(req.query["url"]).then((logos) => {
-							res.status(200).jsonp(Object.assign({}, jsonResponse, { logos: logos }))
-						}).catch((err) => res.status(200).jsonp(Object.assign({}, jsonResponse, { logo_error: err })));;
-					}, (errorMsg, errorCode) => {
-						phantomProcess.kill();
-						res.status(200).jsonp({ "error": errorMsg, "errorCode": errorCode || "000" });
-					});
-				});
-			} catch (err) {
-				phantomProcess.kill();
-				console.log("ERR:Could not create child process" + err + "-" + url);
-				res.status(200).jsonp({ "error": 'Sorry, our server experiences a high load and the service is currently unavailable', "errorCode": "503" });
-			}
-		} else {
-			console.log("ERR:Invalid or missing url parameter", url);
-			res.status(200).jsonp({ "error": 'Invalid or missing "url" parameter', "errorCode": "500" });
-		}
-	} else {
-		res.status(401).jsonp({ "error": 'Invalid referer' });
-	}
+app.get("/query", async (req, res) => {
+  url = req.query["url"];
+  if (url && utils.isValidURL(url)) {
+    let driver = new Builder()
+      .forBrowser("chrome")
+      .setChromeOptions(new chrome.Options().headless())
+      .build();
+    driver.get(url);
+
+    jsonResponse = await new Promise((resolve, reject) => {
+      fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
+        try {
+          let scrapedResponse = await driver.executeScript(data);
+          driver.quit();
+
+          resolve(scrapedResponse);
+        } catch (error) {
+          resolve({ error: error.toString() });
+        }
+      });
+    });
+
+    logoScrape.LogoScrape.getLogos(url)
+      .then((logos) => {
+        res
+          .status(200)
+          .jsonp(Object.assign({}, jsonResponse, { logos: logos }));
+      })
+      .catch((err) =>
+        res
+          .status(200)
+          .jsonp(Object.assign({}, jsonResponse, { logo_error: err }))
+      );
+  } else {
+    console.log("ERR:Invalid or missing url parameter", url);
+    res
+      .status(200)
+      .jsonp({ error: 'Invalid or missing "url" parameter', errorCode: "500" });
+  }
 });
 
 

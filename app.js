@@ -230,11 +230,21 @@ app.get('/getpdf', (req, res) => {
 app.get("/query", async (req, res) => {
   url = req.query["url"];
   if (url && utils.isValidURL(url)) {
+    let opts = new chrome.Options()
+    opts.addArguments("--no-sandbox", "--headless")
+
     let driver = new Builder()
       .forBrowser("chrome")
-      .setChromeOptions(new chrome.Options().headless())
+      .setChromeOptions(opts)
       .build();
     driver.get(url);
+
+    await new Promise((resolve, reject) => {
+      fs.readFile("./lib/jquery-2.1.1.min.js", "utf8", async (err, data) => {
+        await driver.executeScript(data);
+        resolve();
+      });
+    });
 
     jsonResponse = await new Promise((resolve, reject) => {
       fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {

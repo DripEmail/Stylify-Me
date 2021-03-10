@@ -230,9 +230,12 @@ app.get('/getpdf', (req, res) => {
 app.get("/query", async (req, res) => {
   url = req.query["url"];
   if (url && utils.isValidURL(url)) {
+    let opts = new chrome.Options()
+    opts.addArguments("--no-sandbox", "--headless")
+
     let driver = new Builder()
       .forBrowser("chrome")
-      .setChromeOptions(new chrome.Options().headless())
+      .setChromeOptions(opts)
       .build();
     driver.get(url);
 

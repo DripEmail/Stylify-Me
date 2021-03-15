@@ -230,46 +230,54 @@ app.get('/getpdf', (req, res) => {
 app.get("/query", async (req, res) => {
   url = req.query["url"];
   if (url && utils.isValidURL(url)) {
-    let opts = new chrome.Options()
-    opts.addArguments("--no-sandbox", "--headless")
+    try {
 
-    let driver = new Builder()
-      .forBrowser("chrome")
-      .setChromeOptions(opts)
-      .build();
-    driver.get(url);
+      let opts = new chrome.Options()
+      opts.addArguments("--no-sandbox", "--headless")
 
-    await new Promise((resolve, reject) => {
-      fs.readFile("./lib/jquery-2.1.1.min.js", "utf8", async (err, data) => {
-        await driver.executeScript(data);
-        resolve();
+      let driver = new Builder()
+        .forBrowser("chrome")
+        .setChromeOptions(opts)
+        .build();
+      driver.get(url);
+
+      await new Promise((resolve, reject) => {
+        fs.readFile("./lib/jquery-2.1.1.min.js", "utf8", async (err, data) => {
+          await driver.executeScript(data);
+          resolve();
+        });
       });
-    });
 
-    jsonResponse = await new Promise((resolve, reject) => {
-      fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
-        try {
-          let scrapedResponse = await driver.executeScript(data);
-          driver.quit();
+      jsonResponse = await new Promise((resolve, reject) => {
+        fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
+          try {
+            let scrapedResponse = await driver.executeScript(data);
+            driver.quit();
 
-          resolve(scrapedResponse);
-        } catch (error) {
-          resolve({ error: error.toString() });
-        }
+            resolve(scrapedResponse);
+          } catch (error) {
+            resolve({ error: error.toString() });
+          }
+        });
       });
-    });
 
-    logoScrape.LogoScrape.getLogos(url)
-      .then((logos) => {
-        res
-          .status(200)
-          .jsonp(Object.assign({}, jsonResponse, { logos: logos }));
-      })
-      .catch((err) =>
-        res
-          .status(200)
-          .jsonp(Object.assign({}, jsonResponse, { logo_error: err }))
-      );
+      logoScrape.LogoScrape.getLogos(url)
+        .then((logos) => {
+          res
+            .status(200)
+            .jsonp(Object.assign({}, jsonResponse, { logos: logos }));
+        })
+        .catch((err) =>
+          res
+            .status(200)
+            .jsonp(Object.assign({}, jsonResponse, { logo_error: err }))
+        );
+    } catch (error) {
+      console.log("ERR: Something went wrong with chromedriver", error);
+      res
+        .status(200)
+        .jsonp({ error: error.toString(), errorCode: "500" });
+    }
   } else {
     console.log("ERR:Invalid or missing url parameter", url);
     res

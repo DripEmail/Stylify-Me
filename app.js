@@ -243,7 +243,8 @@ app.get("/query", async (req, res) => {
         .forBrowser("chrome")
         .setChromeOptions(opts)
         .build();
-      driver.get(url);
+
+      await driver.get(url);
 
       await new Promise((resolve, reject) => {
         fs.readFile("./lib/jquery-2.1.1.min.js", "utf8", async (err, data) => {

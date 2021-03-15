@@ -73,11 +73,15 @@ app.use((err, req, res, next) => {
 
 const utils = {
 	isValidURL: (urlPath) => {
-		const maybeUrl = new URL(urlPath);
-		if(!maybeUrl.hostname || !/http[s]?:/.test(maybeUrl.protocol)) {
-			return false;
-		}
-		return true;
+    try {
+      const maybeUrl = new URL(urlPath);
+      if (!maybeUrl.hostname || !/http[s]?:/.test(maybeUrl.protocol)) {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+    return true;
 	},
 	deleteFile: (filePath) => {
 		try {

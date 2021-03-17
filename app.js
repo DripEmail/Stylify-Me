@@ -229,21 +229,22 @@ app.get('/getpdf', (req, res) => {
 	}
 });
 
-
-let opts = new chrome.Options()
-opts.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage")
-
-let driver = new Builder()
-	.forBrowser("chrome")
-	.setChromeOptions(opts)
-	.build();
+nextPort = 5005
 
 // returns stylify json
 app.get("/query", async (req, res) => {
   url = req.query["url"];
   if (url && utils.isValidURL(url)) {
     try {
-
+			nextPort++
+			
+			let opts = new chrome.Options()
+			opts.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage", "--remote-debugging-port=" + nextPort)
+			
+			let driver = new Builder()
+				.forBrowser("chrome")
+				.setChromeOptions(opts)
+				.build();
 
       await driver.get(url);
 
@@ -258,7 +259,7 @@ app.get("/query", async (req, res) => {
         fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
           try {
             let scrapedResponse = await driver.executeScript(data);
-
+						
 						driver.close()
 
             resolve(scrapedResponse);

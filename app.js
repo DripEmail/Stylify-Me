@@ -256,7 +256,7 @@ app.get("/query", async (req, res) => {
         fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
           try {
             let scrapedResponse = await driver.executeScript(data);
-            // driver.quit();
+            driver.close();
 
             resolve(scrapedResponse);
           } catch (error) {

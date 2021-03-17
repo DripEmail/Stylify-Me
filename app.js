@@ -229,6 +229,7 @@ app.get('/getpdf', (req, res) => {
 	}
 });
 
+
 let opts = new chrome.Options()
 opts.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage")
 
@@ -258,13 +259,13 @@ app.get("/query", async (req, res) => {
           try {
             let scrapedResponse = await driver.executeScript(data);
 
+						driver.close()
+
             resolve(scrapedResponse);
           } catch (error) {
 
             resolve({ error: error.toString() });
-          } finally {
-						driver.close()
-					}
+          }
         });
       });
 

@@ -230,7 +230,7 @@ app.get('/getpdf', (req, res) => {
 });
 
 let opts = new chrome.Options()
-opts.addArguments("--no-sandbox", "--headless")
+opts.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage")
 
 let driver = new Builder()
 	.forBrowser("chrome")

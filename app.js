@@ -229,20 +229,19 @@ app.get('/getpdf', (req, res) => {
 	}
 });
 
+let opts = new chrome.Options()
+opts.addArguments("--no-sandbox", "--headless")
+
+let driver = new Builder()
+	.forBrowser("chrome")
+	.setChromeOptions(opts)
+	.build();
 
 // returns stylify json
 app.get("/query", async (req, res) => {
   url = req.query["url"];
   if (url && utils.isValidURL(url)) {
     try {
-
-      let opts = new chrome.Options()
-      opts.addArguments("--no-sandbox", "--headless")
-
-      let driver = new Builder()
-        .forBrowser("chrome")
-        .setChromeOptions(opts)
-        .build();
 
       await driver.get(url);
 
@@ -257,7 +256,7 @@ app.get("/query", async (req, res) => {
         fs.readFile("./drip_page_parser.js", "utf8", async (err, data) => {
           try {
             let scrapedResponse = await driver.executeScript(data);
-            driver.quit();
+            // driver.quit();
 
             resolve(scrapedResponse);
           } catch (error) {

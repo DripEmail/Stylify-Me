@@ -79,6 +79,7 @@ function parsePage() {
   var body = $jq(document.body);
   var naMsg = "N/A";
 
+  const socialPlatforms = ["facebook", "instagram", "pinterest", "twitter"];
   var coloursBgReturn = [],
     coloursTextReturn = [];
   var colourAttributes = {},
@@ -87,6 +88,8 @@ function parsePage() {
   var colourOccurences = {};
   const buttonColors = {};
   const linkColors = {};
+  const socialLinks = {};
+  let href;
 
   //select images to return
   if (images.length >= 3) {
@@ -106,6 +109,7 @@ function parsePage() {
   //iterate through every element
   $jq("*").each(function (i, el) {
     colour = null;
+    href = null;
     el = $jq(el);
     $jq.each(["color", "background-color"], function (j, prop) {
       //if we can't find this property or it's null, continue
@@ -124,6 +128,12 @@ function parsePage() {
           linkColors[colour] = { count: 1 };
           linkColors[colour][prop] = 1;
         }
+        href = el.attr('href');
+        socialPlatforms.forEach((platform, i) => {
+          if (href && href.includes(platform)) {
+            socialLinks[platform] = href;
+          }
+        });
       }
 
       if (nodename === "BUTTON") {
@@ -184,6 +194,7 @@ function parsePage() {
       h6: getTypeSet(h6, "Header 6"),
       body: getTypeSet(baseSelector, "Body"),
     },
+    socialLinks: socialLinks,
 
     "p-text-colour": rgb2hex(p.css("color") || naMsg),
     "a-text-colour": rgb2hex(a.css("color") || naMsg),

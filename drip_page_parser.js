@@ -79,7 +79,7 @@ function parsePage() {
   var body = $jq(document.body);
   var naMsg = "N/A";
 
-  const socialPlatforms = ["facebook", "instagram", "pinterest", "twitter"];
+  const socialPlatforms = ["facebook", "instagram", "pinterest", "twitter", "linkedin", "youtube"];
   var coloursBgReturn = [],
     coloursTextReturn = [];
   var colourAttributes = {},
